@@ -1,0 +1,92 @@
+<html>
+<head>
+<meta charset="UTF-8"></meta>
+<script type="text/javascript">
+function getCheckedValue(radioObj) {
+        if(!radioObj)
+                return "";
+        var radioLength = radioObj.length;
+        if(!radioLength)
+                if(radioObj.checked)
+                        return radioObj.value;
+                else
+                        return "";
+        for(var i = 0; i < radioLength; i++) {
+                if(radioObj[i].checked) {
+                        return radioObj[i].value;
+                }
+        }
+        return "";
+}
+var dateReviver = function (key, value) {
+    var a;
+    if (typeof value === 'string') {
+        a = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
+        if (a) {
+            return new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4], +a[5], +a[6]));
+        }
+    }
+    return value;
+};
+function bestdaylong_inq(Name,Sign)
+{
+var xmlhttp;
+
+        if (window.XMLHttpRequest)
+          {// code for IE7+, Firefox, Chrome, Opera, Safari
+          xmlhttp=new XMLHttpRequest();
+          }
+        else
+          {// code for IE6, IE5
+          xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+          }
+        xmlhttp.onreadystatechange=function()
+          {
+                  if (xmlhttp.readyState==4 && xmlhttp.status==200)      
+                  {
+                        var result=xmlhttp.responseText;
+                        var obj = JSON.parse(result,dateReviver);//解析json字串為json物件形式
+                                                
+                        var html = '<table border=1 width=100%>';//
+                        
+                        for (var i = 0; i < obj.length; i ++ ) {//
+                                html  += '<tr>';//
+                                for(j=0;j<obj[i].data.length;j++)
+                                {
+                                  html+= '<td>'+obj[i].data[j]+'</td>';
+                                }
+                                html  += '</tr>';            
+                        }
+                        html+="</table>";
+                        
+                        document.getElementById("order_status").innerHTML=html;
+                        if(obj.length==1) //只有一筆代表查不到資料
+                                alert('查無資料');
+                  }
+
+          }
+    var url="https://script.google.com/macros/s/AKfycbzbC6X8Rh02nKLgHjCxmxfShnLSvfe3zwhJsmiNBhb0w8lRHtU/exec"+"?Name="+Name+"&Sign="+Sign;
+        console.log(url); //這裡要置換後台Google Script的網址
+    xmlhttp.open("get",url);
+    xmlhttp.send();
+}
+</script>
+</head> 
+<body>
+//下面是會顯示在html上，給民眾看的資訊
+<b>查詢是否有成功簽到退？<br />
+姓名：<input id="Name" type="text" /><br />
+我要查詢簽到或簽退(單選)：<br>
+<input type="radio" id="Sign" name="Sign" value="簽到"> 簽到<br>
+<input type="radio" id="Sign" name="Sign" value="簽退"> 簽退<br>
+<br>
+*若點選查詢按鈕後，沒有顯示您的資料，代表<strong>「沒有簽到退成功」</strong><br>
+*因個資保護，您的身分證字號會<strong>隱藏</strong>部分代碼<br>
+*有查詢問題請至聊天室，或依下方客服資訊進行聯繫，感謝！<br>
+</b>
+
+<input name="inq" onclick="bestdaylong_inq(Name.value,getCheckedValue(Sign));" type="button" value="查詢" />
+
+<span id="order_status"></span>
+</body>
+</html>
