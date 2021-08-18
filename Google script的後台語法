@@ -1,0 +1,56 @@
+function doGet(e) {
+  //https://youtu.be/sukRGQDj1G4 影音教學說明，本語法是由「彰化一整天」所寫的，非我自創的，我只是改編做紀錄
+  var params = e.parameter;
+  var Name = params.Name;//姓名欄位資料的變數建立
+  var Sign = params.Sign;//簽到退欄位資料的變數建立
+
+
+  var Sheet = SpreadsheetApp.getActiveSheet();
+
+  var LastRow = Sheet.getLastRow();
+  var LastColumn = Sheet.getLastColumn();
+  var data = [];
+
+  // 取得全部資料
+  var listAll = Sheet.getSheetValues(1, 1, LastRow, LastColumn);
+  
+  //存標題
+  data.push({data: listAll[0]})
+
+  
+  // 找尋資料是否有存在
+  for(var i = 1;i < listAll.length; i++){
+    if(listAll[i].indexOf(Name) ==3 && listAll[i].indexOf(Sign) ==4){ //姓名由第4欄,第0列開始查詢；簽到退資料由第5欄第0列查詢(欄位數字要自動減一，因為程式語言從0開始記數)
+      
+      //身分證去個資顯示功能，可以讓身分證產生**遮蓋
+      listAll[i][5]=string_add_symbol(listAll[i][5],"*");
+      data.push({data: listAll[i]});
+    }
+  }
+  
+  //顯示資料
+  Logger.log(data);
+  
+  // 回傳json資料
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+  
+  Sheet.getSheet
+}
+
+function string_add_symbol(s,symbol)
+{
+   var ss="";
+   for(var i=0;i<s.length;i++)
+     {
+       if(i%2==1)//奇數加符號
+         ss=ss+symbol;
+       else
+         ss=ss+s.substring(i,i+1);
+      }
+  return ss;
+}
+function test_string_add_symbol()
+{
+  Logger.log(string_add_symbol("彰化一整天","*"));//這是原作者的測試
+}
